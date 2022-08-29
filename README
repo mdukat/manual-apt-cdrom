@@ -1,0 +1,40 @@
+How to use:
+
+1. Specify what packages You need, enter them in "packages" file
+
+2. Execute build script, it will build ISO image with all the packages needed for installation
+
+!!! Make sure you have enough space on HDD !!!
+
+3. Burn ISO on CD
+
+4. On other machine, mount the CD, for example:
+
+ mount -o loop /dev/sr0 /media/cdrom
+
+5. Add cdrom path to sources.list: 
+
+ deb [trusted=yes] file:/media/cdrom ./
+
+6. Update apt lists:
+
+ sudo apt update
+
+7. Install your packages:
+
+ sudo apt install nvidia-384 nvidia-cuda-toolkit
+
+
+
+Notes on nvidia drivers on older Ubuntu:
+
+You have to manually disable nouveau. To do this, create file /etc/modprobe.d/blacklist-nouveau.conf
+
+ blacklist nouveau
+ options nouveau modeset=0
+
+And then regenerate the initramfs
+
+ sudo update-initramfs -u
+ sudo reboot
+
