@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Fail on any commands fail
+set -e
+
 check_debian () {
 	if ! command -v $1 &> /dev/null
 	then
@@ -26,17 +29,52 @@ check_software cat
 check_software rm
 check_software mkisofs
 check_software gzip
+check_software touch
 
-echo "Downloading package files..."
+APT_CONFIG=""
+PACKAGES=$(cat packages)
+
+if [ -r sources.list ]; then
+	
+	if [ ! -d /tmp/buildrepo ]; then
+		echo "Setting up directories..."
+
+		mkdir -p /tmp/buildrepo/etc /tmp/buildrepo/var/cache/apt \
+			/tmp/buildrepo/var/lib/dpkg /tmp/buildrepo/var/lib/apt/partial \
+			/tmp/buildrepo/var/lib/apt/archives/partial
+		touch /tmp/buildrepo/var/lib/dpkg/status
+		touch /tmp/buildrepo/var
+
+	else
+		echo "!!! Directories are already made, to reset this state, execute:"
+		echo " rm -rf /tmp/buildrepo"
+		echo ""
+	fi
+	
+	cp sources.list /tmp/buildrepo/etc/sources.list
+	APT_CONFIG="-c $(pwd)/apt.conf"
+fi
+
+echo "Updating lists..."
+
+apt-get ${APT_CONFIG} update
+
+if [ -d repo ]; then
+	echo "Directory \"repo\" exists! If you want to change packages, execute:"
+	echo " rm -rf repo"
+	echo ""
+fi
+
+echo "Downloading package files... (${PACKAGES})"
 
 # https://stackoverflow.com/a/45489718
 
-PACKAGES=$(cat packages)
-
-mkdir repo
+if [ ! -d repo ]; then
+	mkdir repo
+fi
 cd repo
 
-apt-get download $(apt-cache depends --recurse --no-recommends --no-suggests \
+apt-get ${APT_CONFIG} download $(apt-cache ${APT_CONFIG} depends --recurse --no-recommends --no-suggests \
   --no-conflicts --no-breaks --no-replaces --no-enhances \
   --no-pre-depends ${PACKAGES} | grep "^\w")
 
@@ -58,4 +96,12 @@ echo "Building ISO image..."
 # https://unix.stackexchange.com/a/274751
 
 mkisofs -lJR -o repo.iso .
+
+if [ -r clean ]; then
+	echo "Cleaning..."
+
+	rm -rf /tmp/buildrepo
+	rm -rf repo
+	rm Packages.gz
+fi
 

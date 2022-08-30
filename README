@@ -2,6 +2,12 @@ How to use:
 
 1. Specify what packages You need, enter them in "packages" file
 
+ 1a. If you want to create image on other OS than target, create sources.list file and enter target source repositories
+ 
+ 1b. If you want the script to remove downloaded files, and only leave ISO image, execute:
+ 
+  touch clean
+ 
 2. Execute build script, it will build ISO image with all the packages needed for installation
 
 !!! Make sure you have enough space on HDD !!!
@@ -37,4 +43,8 @@ And then regenerate the initramfs
 
  sudo update-initramfs -u
  sudo reboot
+
+
+
+Notes for script itself:
 
