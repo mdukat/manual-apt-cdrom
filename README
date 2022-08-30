@@ -48,3 +48,4 @@ And then regenerate the initramfs
 
 Notes for script itself:
 
+Script will remove i386 packages, and download amd64 packages by default. If you need other architecture, modify the script!

@@ -53,11 +53,11 @@ if [ -r sources.list ]; then
 	
 	cp sources.list /tmp/buildrepo/etc/sources.list
 	APT_CONFIG="-c $(pwd)/apt.conf"
+
+	echo "Updating lists..."
+	apt-get ${APT_CONFIG} update
 fi
 
-echo "Updating lists..."
-
-apt-get ${APT_CONFIG} update
 
 if [ -d repo ]; then
 	echo "Directory \"repo\" exists! If you want to change packages, execute:"
