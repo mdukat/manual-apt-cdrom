@@ -44,6 +44,8 @@ echo "Removing i386 packages. If you want them, modify me!"
 
 rm -rf *_i386.deb
 
+cd ..
+
 echo "Building package list for apt..."
 
 # https://askubuntu.com/a/458754
